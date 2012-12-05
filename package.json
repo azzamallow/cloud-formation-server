@@ -5,6 +5,7 @@
     "private": true,
     "dependencies": {
         "coffee-script": "1.4.0",
-        "express": "3.x"
+        "express": "3.x",
+        "aws2js": "0.7.8"
     }
 }
