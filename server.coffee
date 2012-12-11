@@ -4,7 +4,9 @@
 @app.use @express.bodyParser()
 
 @environment = require './environment'
+@template = require './template'
 
+@template.init @app
 @environment.init @app
 
 @app.listen 3000
