@@ -1,13 +1,14 @@
-@express = require 'express'
-@app = @express()
+# init
+express = require 'express'
+@app = express()
 
-@app.use @express.bodyParser()
+# configure
+@app.use express.bodyParser()
 
-@environment = require './environment'
-@template = require './template'
+# connect
+require('./resources/environment').connect @app
+require('./resources/template')   .connect @app
 
-@template.init @app
-@environment.init @app
-
+# start
 @app.listen 3000
 console.log 'Listening on port 3000'
