@@ -1,4 +1,4 @@
-exports.index = (req, res) ->
+exports.all = (req, res) ->
     res.send [
         'ci', 'canary', 'qa', 'production'
     ]

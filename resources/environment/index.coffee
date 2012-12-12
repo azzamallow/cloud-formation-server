@@ -1,7 +1,7 @@
 @environment = require './environment.coffee'
 
 exports.connect = (app) ->
-    app.get     '/environment',             @environment.index
+    app.get     '/environment',             @environment.all
     app.get     '/environment/:id',         @environment.get
     app.put     '/environment/:id',         @environment.put
     app.post    '/environment/:id',         @environment.post
