@@ -7,7 +7,7 @@ express = require 'express'
 
 # connect
 require('./resources/environment').connect @app
-require('./resources/template')   .connect @app
+require('./resources/template'   ).connect @app
 
 # start
 @app.listen 3000
