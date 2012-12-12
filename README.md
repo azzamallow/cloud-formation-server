@@ -7,8 +7,7 @@ Formation actions on AWS
 
 ```
 git clone https://github.com/azzamallow/cloud-formation-server.git
+npm install -g supervisor coffee-script
 npm install
-npm install supervisor -g
-npm install coffee-script -g
 supervisor server.coffee
 ```

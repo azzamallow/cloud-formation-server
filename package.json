@@ -6,7 +6,6 @@
     "dependencies": {
         "coffee-script": "1.4.0",
         "express": "3.x",
-        "aws2js": "0.7.8",
-        "supervisor": "0.5.0"
+        "aws2js": "0.7.8"
     }
 }
