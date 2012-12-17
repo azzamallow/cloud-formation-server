@@ -4,6 +4,7 @@ express = require 'express'
 
 # configure
 @app.use express.bodyParser()
+@app.use express.logger()
 
 # connect
 require('./resources/environments').connect @app
