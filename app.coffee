@@ -6,8 +6,8 @@ express = require 'express'
 @app.use express.bodyParser()
 
 # connect
-require('./resources/environment').connect @app
-require('./resources/template'   ).connect @app
+require('./resources/environments').connect @app
+require('./resources/templates'   ).connect @app
 
 # start
 @app.listen 3000
