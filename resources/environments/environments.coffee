@@ -22,7 +22,15 @@ exports.all = (req, res) =>
 
         members = result['ListStacksResult']['StackSummaries']['member']
 
-        res.send members.filter (member) -> member['StackName'].match "-#{environmentName}$"
+        filtered = members.filter (member) -> member['StackName'].match "-#{environmentName}$"
+
+        environments = filtered.map (entry) -> {
+            id: entry['StackName'].match("(.*)-#{environmentName}$")[1],
+            status: entry['StackStatus'],
+            creationTime: entry['CreationTime']
+        }
+
+        res.send environments
 
 exports.get = (req, res) ->
     
