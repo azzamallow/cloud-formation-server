@@ -8,4 +8,4 @@ exports.all = (req, res) =>
             res.end 'Error occured. Sorry'
             return
         
-        res.send result
+        res.send result['Contents'].map (bucketEntry) -> bucketEntry['Key']
