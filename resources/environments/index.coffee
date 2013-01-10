@@ -1,4 +1,4 @@
-@environments = require './environments.coffee'
+@environments = require './environments'
 
 exports.connect = (app) ->
     app.get     '/environments',             @environments.all
