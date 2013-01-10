@@ -1,4 +1,3 @@
-request         = require './api-request'
 api             = require 'aws2js'
 cloudformation  = api.
                   load('cloudformation', process.env.ACCESS_KEY, process.env.ACCESS_KEY_SECRET).
@@ -10,16 +9,35 @@ cloudformation  = api.
 # UPDATE_COMPLETE | UPDATE_ROLLBACK_IN_PROGRESS | UPDATE_ROLLBACK_FAILED | 
 # UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS | UPDATE_ROLLBACK_COMPLETE
 
-exports.listStacks = (environmentName, callback) ->
+exports.listStacks = (environmentName, errorCallback, callback) ->
     query = {
         'StackStatusFilter.member.1': 'CREATE_COMPLETE',
         'StackStatusFilter.member.2': 'CREATE_IN_PROGRESS'
     }
 
-    request cloudformation, 'ListStacks', query, (result) =>
+    cloudformation.request 'ListStacks', query, (error, result) ->
+        errorCallback() if error?
         members = result['ListStacksResult']['StackSummaries']['member']
-        stacks = members.filter (member) => member['StackName'].match "-#{environmentName}$"
+        stacks  = members.filter (member) => member['StackName'].match "-#{environmentName}$"
         callback stacks
 
-# exports.describeStacks = (environmentName, callback) ->
-    
+exports.describeStacks = (id, environmentName, errorCallback, callback) ->
+    query = {
+        'StackName': "#{id}-#{environmentName}"
+    }
+
+    cloudformation.request 'DescribeStacks', query, (error, result) ->
+        errorCallback() if error?
+        member = result['DescribeStacksResult']['Stacks']['member']
+        callback member
+
+exports.listStackResources = (id, environmentName, resourceType, errorCallback, callback) ->
+    query = {
+        'StackName': "#{id}-#{environmentName}"
+    }
+
+    cloudformation.request 'ListStackResources', query, (error, result) ->
+        errorCallback() if error?
+        members   = result['ListStackResourcesResult']['StackResourceSummaries']['member']
+        resources = members.filter (member) => member['ResourceType'] == resourceType
+        callback resources
