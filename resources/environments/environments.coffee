@@ -6,31 +6,18 @@ ec2             = api.
                   load('ec2', process.env.ACCESS_KEY, process.env.ACCESS_KEY_SECRET).
                   setRegion(process.env.AWS_REGION)
 
+cloudFormation = require '../../lib/cloudformation'
+
 @request = require '../../lib/api-request'
 
 @environmentName = process.env.ENVIRONMENT_NAME
 
-# CREATE_IN_PROGRESS | CREATE_FAILED | CREATE_COMPLETE | ROLLBACK_IN_PROGRESS | 
-# ROLLBACK_FAILED | ROLLBACK_COMPLETE | DELETE_IN_PROGRESS | DELETE_FAILED | 
-# DELETE_COMPLETE | UPDATE_IN_PROGRESS | UPDATE_COMPLETE_CLEANUP_IN_PROGRESS | 
-# UPDATE_COMPLETE | UPDATE_ROLLBACK_IN_PROGRESS | UPDATE_ROLLBACK_FAILED | 
-# UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS | UPDATE_ROLLBACK_COMPLETE
-
 exports.all = (req, res) =>
-    query = {
-        'StackStatusFilter.member.1': 'CREATE_COMPLETE',
-        'StackStatusFilter.member.2': 'CREATE_IN_PROGRESS'
-    }
-
-    @request cloudformation, 'ListStacks', query, (result) =>
-        members = result['ListStacksResult']['StackSummaries']['member']
-
-        filtered = members.filter (member) => member['StackName'].match "-#{@environmentName}$"
-
-        environments = filtered.map (member) => {
-            id:           member['StackName'].match("(.*)-#{@environmentName}$")[1],
-            status:       member['StackStatus'],
-            creationTime: member['CreationTime']
+    cloudFormation.listStacks @environmentName, (stacks) =>
+        environments = stacks.map (stack) => {
+            id:           stack['StackName'].match("(.*)-#{@environmentName}$")[1],
+            status:       stack['StackStatus'],
+            creationTime: stack['CreationTime']
         }
 
         res.send environments
