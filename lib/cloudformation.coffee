@@ -15,9 +15,9 @@ exports.listStacks = (environmentName, errorCallback, callback) ->
         stacks  = members.filter (member) => member['StackName'].match "-#{environmentName}$"
         callback stacks
 
-exports.describeStacks = (id, environmentName, errorCallback, callback) ->
+exports.describeStacks = (stackName, errorCallback, callback) ->
     query = {
-        'StackName': "#{id}-#{environmentName}"
+        'StackName': stackName
     }
 
     cloudformation.request 'DescribeStacks', query, (error, result) ->
@@ -25,9 +25,9 @@ exports.describeStacks = (id, environmentName, errorCallback, callback) ->
         member = result['DescribeStacksResult']['Stacks']['member'] if result?
         callback member
 
-exports.listStackResources = (id, environmentName, resourceType, errorCallback, callback) ->
+exports.listStackResources = (stackName, resourceType, errorCallback, callback) ->
     query = {
-        'StackName': "#{id}-#{environmentName}"
+        'StackName': stackName
     }
 
     cloudformation.request 'ListStackResources', query, (error, result) ->

@@ -17,8 +17,10 @@ exports.get = (req, res) ->
     handleError = (error) ->
         res.send error.code, error.document['Error']['Message']
 
-    cloudformation.describeStacks req.params.id, environmentName, handleError, (stack) ->
-        cloudformation.listStackResources req.params.id, environmentName, 'AWS::EC2::Instance', handleError, (resources) ->
+    stackName = "#{req.params.id}-#{environmentName}"
+    
+    cloudformation.describeStacks stackName, handleError, (stack) ->
+        cloudformation.listStackResources stackName, 'AWS::EC2::Instance', handleError, (resources) ->
             ec2.describeInstanceStatus resources, handleError, (instances) ->
                 res.send {
                     id:           req.params.id,
