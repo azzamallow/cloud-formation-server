@@ -3,9 +3,8 @@ ec2             = require '../../lib/ec2',
 environmentName = process.env.ENVIRONMENT_NAME
 
 exports.all = (req, res) ->
-    handleError = () ->
-        res.writeHead 500 
-        res.end 'Error occured. Sorry'
+    handleError = (error) ->
+        res.send error.code, error.document['Error']['Message'] 
 
     cloudformation.listStacks environmentName, handleError, (stacks) ->
         environments = stacks.map (stack) -> {
@@ -17,9 +16,8 @@ exports.all = (req, res) ->
         res.send environments
 
 exports.get = (req, res) ->
-    handleError = () ->
-        res.writeHead 500 
-        res.end 'Error occured. Sorry'
+    handleError = (error) ->
+        res.send error.code, error.document['Error']['Message']
 
     cloudformation.describeStacks req.params.id, environmentName, handleError, (stack) ->
         environment = {

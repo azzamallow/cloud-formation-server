@@ -16,7 +16,7 @@ exports.listStacks = (environmentName, errorCallback, callback) ->
     }
 
     cloudformation.request 'ListStacks', query, (error, result) ->
-        errorCallback() if error?
+        errorCallback(error) if error?
         members = result['ListStacksResult']['StackSummaries']['member']
         stacks  = members.filter (member) => member['StackName'].match "-#{environmentName}$"
         callback stacks
@@ -27,8 +27,8 @@ exports.describeStacks = (id, environmentName, errorCallback, callback) ->
     }
 
     cloudformation.request 'DescribeStacks', query, (error, result) ->
-        errorCallback() if error?
-        member = result['DescribeStacksResult']['Stacks']['member']
+        errorCallback(error) if error?
+        member = result['DescribeStacksResult']['Stacks']['member'] if result?
         callback member
 
 exports.listStackResources = (id, environmentName, resourceType, errorCallback, callback) ->
@@ -37,7 +37,7 @@ exports.listStackResources = (id, environmentName, resourceType, errorCallback, 
     }
 
     cloudformation.request 'ListStackResources', query, (error, result) ->
-        errorCallback() if error?
+        errorCallback(error) if error?
         members   = result['ListStackResourcesResult']['StackResourceSummaries']['member']
         resources = members.filter (member) => member['ResourceType'] == resourceType
         callback resources
