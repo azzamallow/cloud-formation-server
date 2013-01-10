@@ -8,10 +8,8 @@ exports.describeInstanceStatus = (resources, errorCallback, callback) ->
         'IncludeAllInstances': true
     }
 
-    count = 1
-    for resource in resources
-        query["InstanceId.#{count}"] = resource['PhysicalResourceId']
-        count++
+    for resource, i in resources
+        query["InstanceId.#{i}"] = resource['PhysicalResourceId']
 
     ec2.request 'DescribeInstanceStatus', query, (error, result) ->
         errorCallback(error) if error?
