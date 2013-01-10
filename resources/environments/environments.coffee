@@ -1,10 +1,12 @@
-@cloudformation  = require('aws2js').
-                    load('cloudformation', process.env.ACCESS_KEY, process.env.ACCESS_KEY_SECRET).
-                    setRegion(process.env.AWS_REGION)
+api             = require('aws2js')
+cloudformation  = api.
+                  load('cloudformation', process.env.ACCESS_KEY, process.env.ACCESS_KEY_SECRET).
+                  setRegion(process.env.AWS_REGION)
+ec2             = api.
+                  load('ec2', process.env.ACCESS_KEY, process.env.ACCESS_KEY_SECRET).
+                  setRegion(process.env.AWS_REGION)
 
-@ec2  = require('aws2js').
-                    load('ec2', process.env.ACCESS_KEY, process.env.ACCESS_KEY_SECRET).
-                    setRegion(process.env.AWS_REGION)
+@request = require '../../lib/api-request'
 
 @environmentName = process.env.ENVIRONMENT_NAME
 
@@ -20,12 +22,7 @@ exports.all = (req, res) =>
         'StackStatusFilter.member.2': 'CREATE_IN_PROGRESS'
     }
 
-    @cloudformation.request 'ListStacks', query, (error, result) =>
-        if error?
-            res.writeHead 500 
-            res.end 'Error occured. Sorry'
-            return
-
+    @request cloudformation, 'ListStacks', query, (result) =>
         members = result['ListStacksResult']['StackSummaries']['member']
 
         filtered = members.filter (member) => member['StackName'].match "-#{@environmentName}$"
@@ -43,12 +40,7 @@ exports.get = (req, res) =>
         'StackName': "#{req.params.id}-#{@environmentName}"
     }
 
-    @cloudformation.request 'DescribeStacks', query, (error, result) =>
-        if error?
-            res.writeHead 500 
-            res.end 'Error occured. Sorry'
-            return
-
+    @request cloudformation, 'DescribeStacks', query, (result) =>
         member = result['DescribeStacksResult']['Stacks']['member']
 
         environment = {
@@ -57,12 +49,7 @@ exports.get = (req, res) =>
             creationTime: member['CreationTime']
         }
 
-        @cloudformation.request 'ListStackResources', query, (error, result) =>
-            if error?
-                res.writeHead 500 
-                res.end 'Error occured. Sorry'
-                return
-
+        @request cloudformation, 'ListStackResources', query, (result) =>
             members = result['ListStackResourcesResult']['StackResourceSummaries']['member']
 
             filtered = members.filter (member) => member['ResourceType'] == 'AWS::EC2::Instance'
@@ -76,15 +63,8 @@ exports.get = (req, res) =>
                 instance_query["InstanceId.#{count}"] = member['PhysicalResourceId']
                 count++
 
-            @ec2.request 'DescribeInstanceStatus', instance_query, (error, result) =>
-                if error?
-                    res.writeHead 500 
-                    res.end 'Error occured. Sorry'
-                    return
-
+            @request ec2, 'DescribeInstanceStatus', instance_query, (result) =>
                 items = result['instanceStatusSet']['item']
-                res.send environment unless items?
-
                 items = [items] unless items.length
 
                 environment.instances = items.map (item) => {
