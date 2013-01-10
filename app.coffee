@@ -5,9 +5,6 @@ express = require 'express'
 # configure
 @app.use express.bodyParser()
 @app.use express.logger()
-# @app.use (err, req, res, next) ->
-#   console.error err.stack
-#   res.send 500, 'Something broke!');
 
 # connect
 require('./resources/environments').connect @app
