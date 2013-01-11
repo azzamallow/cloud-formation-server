@@ -4,10 +4,7 @@ cloudformation  = api.
                   setRegion(process.env.AWS_REGION)
 
 exports.listStacks = (environmentName, errorCallback, callback) ->
-    query = {
-        'StackStatusFilter.member.1': 'CREATE_COMPLETE',
-        'StackStatusFilter.member.2': 'CREATE_IN_PROGRESS'
-    }
+    query = 'StackStatusFilter.member.1': 'CREATE_COMPLETE', 'StackStatusFilter.member.2': 'CREATE_IN_PROGRESS'
 
     cloudformation.request 'ListStacks', query, (error, result) ->
         errorCallback(error) if error?
@@ -16,9 +13,7 @@ exports.listStacks = (environmentName, errorCallback, callback) ->
         callback stacks
 
 exports.describeStacks = (stackName, errorCallback, callback) ->
-    query = {
-        'StackName': stackName
-    }
+    query = 'StackName': stackName
 
     cloudformation.request 'DescribeStacks', query, (error, result) ->
         errorCallback(error) if error?
@@ -26,9 +21,7 @@ exports.describeStacks = (stackName, errorCallback, callback) ->
         callback member
 
 exports.listStackResources = (stackName, resourceType, errorCallback, callback) ->
-    query = {
-        'StackName': stackName
-    }
+    query = 'StackName': stackName
 
     cloudformation.request 'ListStackResources', query, (error, result) ->
         errorCallback(error) if error?
@@ -37,10 +30,7 @@ exports.listStackResources = (stackName, resourceType, errorCallback, callback) 
         callback resources
 
 exports.createStack = (stackName, templateBody, templateParams, errorCallback, callback) ->
-    query = {
-        'StackName': stackName,
-        'TemplateBody': templateBody,
-    }
+    query = 'StackName': stackName, 'TemplateBody': templateBody
 
     count = 1
     for key, value of templateParams
@@ -53,10 +43,7 @@ exports.createStack = (stackName, templateBody, templateParams, errorCallback, c
         callback()
 
 exports.updateStack = (stackName, templateBody, templateParams, errorCallback, callback) ->
-    query = {
-        'StackName': stackName,
-        'TemplateBody': templateBody,
-    }
+    query = 'StackName': stackName, 'TemplateBody': templateBody
 
     count = 1
     for key, value of templateParams
@@ -69,9 +56,7 @@ exports.updateStack = (stackName, templateBody, templateParams, errorCallback, c
         callback()    
 
 exports.deleteStack = (stackName, errorCallback, callback) ->
-    query = {
-        'StackName': stackName
-    }
+    query = 'StackName': stackName
 
     cloudformation.request 'DeleteStack', query, (error, result) ->
         errorCallback(error) if error?

@@ -62,8 +62,7 @@ exports.delete = (req, res) ->
 
     stackName = "#{req.params.id}-#{environmentName}"
 
-    cloudformation.deleteStack stackName, handleError, () ->
-        res.send ''
+    cloudformation.deleteStack stackName, handleError, () -> res.send ''
 
 exports.start = (req, res) ->
     handleError = (error) ->

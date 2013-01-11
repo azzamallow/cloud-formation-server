@@ -4,9 +4,7 @@ ec2 = api.
       setRegion(process.env.AWS_REGION)
 
 exports.describeInstanceStatus = (resources, errorCallback, callback) ->
-    query = {
-        'IncludeAllInstances': true
-    }
+    query = 'IncludeAllInstances': true
 
     for resource, i in resources
         query["InstanceId.#{i}"] = resource['PhysicalResourceId']
