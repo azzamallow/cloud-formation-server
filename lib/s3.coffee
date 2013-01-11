@@ -7,3 +7,8 @@ exports.get = (errorCallback, callback) ->
     s3.get '/', 'xml', (error, result) ->
         errorCallback(error) if error?
         callback result
+
+exports.getObject = (objectName, errorCallback, callback) ->
+    s3.get "/#{objectName}", 'xml', (error, result) ->
+        errorCallback(error) if error?
+        callback result    

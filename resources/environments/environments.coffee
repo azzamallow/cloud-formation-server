@@ -36,19 +36,25 @@ exports.put = (req, res) ->
     handleError = (error) ->
         res.send error.code, error.document['Error']['Message']
 
-    stackName = "#{req.params.id}-#{environmentName}"
+    stackName      = "#{req.params.id}-#{environmentName}"
+    templateParams = res.body
+    templateName   = req.params.templateName
 
-    cloudformation.updateStack stackName, templateName, res.body, handleError, () ->
-        res.send req.body
+    s3.getObject templateName, handleError, (templateObject) ->
+        cloudformation.updateStack stackName, templateObject, templateParams, handleError, () ->
+            res.send req.body
 
 exports.post = (req, res) ->
     handleError = (error) ->
         res.send error.code, error.document['Error']['Message']
 
-    stackName = "#{req.params.id}-#{environmentName}"
+    stackName      = "#{req.params.id}-#{environmentName}"
+    templateParams = res.body
+    templateName   = req.params.templateName
 
-    cloudformation.createStack stackName, templateName, res.body, handleError, () ->
-        res.send req.body
+    s3.getObject templateName, handleError, (templateObject) ->
+        cloudformation.createStack stackName, templateObject, templateParams, handleError, () ->
+            res.send req.body
 
 exports.delete = (req, res) ->
     handleError = (error) ->
@@ -56,7 +62,7 @@ exports.delete = (req, res) ->
 
     stackName = "#{req.params.id}-#{environmentName}"
 
-    cloudformation.createStack stackName, templateName, res.body, handleError, () ->
+    cloudformation.deleteStack stackName, handleError, () ->
         res.send ''
 
 exports.start = (req, res) ->
