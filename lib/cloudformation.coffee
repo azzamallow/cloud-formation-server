@@ -35,3 +35,44 @@ exports.listStackResources = (stackName, resourceType, errorCallback, callback) 
         members   = result['ListStackResourcesResult']['StackResourceSummaries']['member']
         resources = members.filter (member) => member['ResourceType'] == resourceType
         callback resources
+
+exports.createStack = (stackName, templateBody, templateParams, errorCallback, callback) ->
+    query = {
+        'StackName': stackName,
+        'TemplateBody': templateBody,
+    }
+
+    count = 1
+    for key, value of templateParams
+        query["Parameters.member.#{i}.ParameterKey"] = key
+        query["Parameters.member.#{i}.ParameterValue"] = value
+        count++
+
+    cloudformation.request 'CreateStack', query, (error, result) ->
+        errorCallback(error) if error?
+        callback()
+
+exports.updateStack = (stackName, templateBody, templateParams, errorCallback, callback) ->
+    query = {
+        'StackName': stackName,
+        'TemplateBody': templateBody,
+    }
+
+    count = 1
+    for key, value of templateParams
+        query["Parameters.member.#{i}.ParameterKey"] = key
+        query["Parameters.member.#{i}.ParameterValue"] = value
+        count++
+
+    cloudformation.request 'UpdateStack', query, (error, result) ->
+        errorCallback(error) if error?
+        callback()    
+
+exports.deleteStack = (stackName, errorCallback, callback) ->
+    query = {
+        'StackName': stackName
+    }
+
+    cloudformation.request 'DeleteStack', query, (error, result) ->
+        errorCallback(error) if error?
+        callback()

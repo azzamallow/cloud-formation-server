@@ -33,18 +33,31 @@ exports.get = (req, res) ->
                 }
 
 exports.put = (req, res) ->
-    res.send [
-        {params: req.body.phone}
-    ]
+    handleError = (error) ->
+        res.send error.code, error.document['Error']['Message']
+
+    stackName = "#{req.params.id}-#{environmentName}"
+
+    cloudformation.updateStack stackName, templateName, res.body, handleError, () ->
+        res.send req.body
 
 exports.post = (req, res) ->
-    res.send [
-        {params: req.body.phone}
-    ]
+    handleError = (error) ->
+        res.send error.code, error.document['Error']['Message']
+
+    stackName = "#{req.params.id}-#{environmentName}"
+
+    cloudformation.createStack stackName, templateName, res.body, handleError, () ->
+        res.send req.body
 
 exports.delete = (req, res) ->
-    console.log 'issued delete'
-    res.send ''
+    handleError = (error) ->
+        res.send error.code, error.document['Error']['Message']
+
+    stackName = "#{req.params.id}-#{environmentName}"
+
+    cloudformation.createStack stackName, templateName, res.body, handleError, () ->
+        res.send ''
 
 exports.start = (req, res) ->
     console.log 'starting'
