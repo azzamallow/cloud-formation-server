@@ -7,11 +7,10 @@ exports.all = (req, res) ->
         res.send error.code, error.document['Error']['Message'] 
 
     cloudformation.listStacks environmentName, handleError, (stacks) ->
-        res.send stacks.map (stack) -> {
+        res.send stacks.map (stack) ->
             id:           stack['StackName'].match("(.*)-#{environmentName}$")[1],
             status:       stack['StackStatus'],
             creationTime: stack['CreationTime']
-        }
 
 exports.get = (req, res) ->
     handleError = (error) ->
@@ -22,15 +21,13 @@ exports.get = (req, res) ->
     cloudformation.describeStacks stackName, handleError, (stack) ->
         cloudformation.listStackResources stackName, 'AWS::EC2::Instance', handleError, (resources) ->
             ec2.describeInstanceStatus resources, handleError, (instances) ->
-                res.send {
+                res.send
                     id:           req.params.id,
                     status:       stack['StackStatus'],
                     creationTime: stack['CreationTime'],
-                    instances:    instances.map (instance) -> {
+                    instances:    instances.map (instance) ->
                         instance: instance['instanceId'],
                         status:   instance['instanceState']['name']
-                    }
-                }
 
 exports.put = (req, res) ->
     handleError = (error) ->
