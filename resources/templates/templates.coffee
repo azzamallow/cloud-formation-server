@@ -1,11 +1,8 @@
-@s3 = require('aws2js').load('s3', process.env.ACCESS_KEY, process.env.ACCESS_KEY_SECRET)
+s3 = require '../../lib/s3'
 
-exports.all = (req, res) =>
-    @s3.setBucket process.env.BUCKET_NAME
-    @s3.get '/', 'xml', (error, result) ->
-        if error?
-            res.writeHead 500 
-            res.end 'Error occured. Sorry'
-            return
-        
-        res.send result['Contents'].map (bucketEntry) -> bucketEntry['Key']
+exports.all = (req, res) ->
+    handleError = (error) ->
+        res.send error.code, error.document['Error']['Message'] 
+
+    s3.get handleError, (templates) ->
+        res.send templates['Contents'].map (template) -> template['Key']
