@@ -15,7 +15,7 @@ exports.describeInstanceStatus = (resources, errorCallback, callback) ->
         items = [items] unless items.length
         callback items
 
-exports.startInstances = (instanceId, handleError) ->
+exports.startInstances = (resources, handleError) ->
     query = {}
     for resource, i in resources
         query["InstanceId.#{i}"] = resource['PhysicalResourceId']
@@ -24,7 +24,7 @@ exports.startInstances = (instanceId, handleError) ->
         errorCallback(error) if error?
         callback()
 
-exports.stopInstances = (instanceId, handleError) ->
+exports.stopInstances = (resources, handleError) ->
     query = {}
     for resource, i in resources
         query["InstanceId.#{i}"] = resource['PhysicalResourceId']
@@ -33,7 +33,7 @@ exports.stopInstances = (instanceId, handleError) ->
         errorCallback(error) if error?
         callback()
 
-exports.rebootInstances = (instanceId, handleError) ->
+exports.rebootInstances = (resources, handleError) ->
     query = {}
     for resource, i in resources
         query["InstanceId.#{i}"] = resource['PhysicalResourceId']
