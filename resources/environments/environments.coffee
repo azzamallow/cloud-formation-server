@@ -60,13 +60,31 @@ exports.delete = (req, res) ->
         res.send ''
 
 exports.start = (req, res) ->
-    console.log 'starting'
-    res.send ''
+    handleError = (error) ->
+        res.send error.code, error.document['Error']['Message']
+
+    stackName = "#{req.params.id}-#{environmentName}"
+    
+    cloudformation.describeStacks stackName, handleError, (stack) ->
+        cloudformation.listStackResources stackName, 'AWS::EC2::Instance', handleError, (resources) ->
+            ec2.startInstances resources, handleError, () -> res.send ''
 
 exports.stop = (req, res) ->
-    console.log 'stopping'
-    res.send ''
+    handleError = (error) ->
+        res.send error.code, error.document['Error']['Message']
+
+    stackName = "#{req.params.id}-#{environmentName}"
+    
+    cloudformation.describeStacks stackName, handleError, (stack) ->
+        cloudformation.listStackResources stackName, 'AWS::EC2::Instance', handleError, (resources) ->
+            ec2.stopInstances resources, handleError, () -> res.send ''
 
 exports.reboot = (req, res) ->
-    console.log 'reboot'
-    res.send ''
+    handleError = (error) ->
+        res.send error.code, error.document['Error']['Message']
+
+    stackName = "#{req.params.id}-#{environmentName}"
+    
+    cloudformation.describeStacks stackName, handleError, (stack) ->
+        cloudformation.listStackResources stackName, 'AWS::EC2::Instance', handleError, (resources) ->
+            ec2.rebootInstances resources, handleError, () -> res.send ''
