@@ -11,7 +11,7 @@ exports.describeInstanceStatus = (resources, next, callback) ->
 
     request 'DescribeInstanceStatus', query, next, (result) ->
         items = result['instanceStatusSet']['item']
-        items = [items] unless items.length
+        items = [].concat items
         callback items
 
 exports.startInstances = (resources, next) ->
