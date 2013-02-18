@@ -1,7 +1,8 @@
-api = require 'aws2js'
-ec2 = api.
-      load('ec2', process.env.ACCESS_KEY, process.env.ACCESS_KEY_SECRET).
-      setRegion(process.env.AWS_REGION)
+api     = require 'aws2js'
+ec2     = api.
+          load('ec2', process.env.ACCESS_KEY, process.env.ACCESS_KEY_SECRET).
+          setRegion(process.env.AWS_REGION)
+request = require('./request').for(ec2)
 
 exports.describeInstanceStatus = (resources, next, callback) ->
     query = 'IncludeAllInstances': true
@@ -34,10 +35,3 @@ exports.rebootInstances = (resources, next) ->
         query["InstanceId.#{i}"] = resource['PhysicalResourceId']
 
     request 'RebootInstances', query, next, callback
-
-request = (method, query, next, callback) ->
-    ec2.request method, query, (error, result) ->
-        if error?
-            next error
-        else
-            callback result
