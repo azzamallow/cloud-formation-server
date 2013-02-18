@@ -3,41 +3,41 @@ ec2 = api.
       load('ec2', process.env.ACCESS_KEY, process.env.ACCESS_KEY_SECRET).
       setRegion(process.env.AWS_REGION)
 
-exports.describeInstanceStatus = (resources, errorCallback, callback) ->
+exports.describeInstanceStatus = (resources, next, callback) ->
     query = 'IncludeAllInstances': true
 
     for resource, i in resources
         query["InstanceId.#{i}"] = resource['PhysicalResourceId']
 
-    ec2.request 'DescribeInstanceStatus', query, (error, result) ->
-        errorCallback(error) if error?
+    request 'DescribeInstanceStatus', query, next, (result) ->
         items = result['instanceStatusSet']['item']
         items = [items] unless items.length
         callback items
 
-exports.startInstances = (resources, handleError) ->
+exports.startInstances = (resources, next) ->
     query = {}
     for resource, i in resources
         query["InstanceId.#{i}"] = resource['PhysicalResourceId']
 
-    ec2.request 'StartInstances', query, (error, result) ->
-        errorCallback(error) if error?
-        callback()
+    request 'StartInstances', query, next, callback
 
-exports.stopInstances = (resources, handleError) ->
+exports.stopInstances = (resources, next) ->
     query = {}
     for resource, i in resources
         query["InstanceId.#{i}"] = resource['PhysicalResourceId']
 
-    ec2.request 'StopInstances', query, (error, result) ->
-        errorCallback(error) if error?
-        callback()
+    request 'StopInstances', query, next, callback
 
-exports.rebootInstances = (resources, handleError) ->
+exports.rebootInstances = (resources, next) ->
     query = {}
     for resource, i in resources
         query["InstanceId.#{i}"] = resource['PhysicalResourceId']
 
-    ec2.request 'RebootInstances', query, (error, result) ->
-        errorCallback(error) if error?
-        callback()
+    request 'RebootInstances', query, next, callback
+
+request = (method, query, next, callback) ->
+    ec2.request method, query, (error, result) ->
+        if error?
+            next error
+        else
+            callback result

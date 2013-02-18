@@ -2,23 +2,16 @@ cloudformation  = require '../../lib/cloudformation',
 ec2             = require '../../lib/ec2',
 environmentName = process.env.ENVIRONMENT_NAME
 
-exports.all = (req, res) ->
-    handleError = (error) ->
-        res.send error.code, error.document['Error']['Message'] 
-
-    cloudformation.listStacks environmentName, handleError, (stacks) ->
+exports.all = (req, res, next) ->
+    cloudformation.listStacks environmentName, next, (stacks) ->
         res.send stacks.map (stack) ->
             id:           stack['StackName'].match("(.*)-#{environmentName}$")[1],
             status:       stack['StackStatus'],
             creationTime: stack['CreationTime']
 
-exports.get = (req, res) ->
-    handleError = (error) ->
-        res.send error.code, error.document['Error']['Message']
-
+exports.get = (req, res, next) ->
     stackName = "#{req.params.id}-#{environmentName}"
-    
-    cloudformation.describeStacks stackName, handleError, (stack) ->
+    cloudformation.describeStacks stackName, next, (stack) ->
         cloudformation.listStackResources stackName, 'AWS::EC2::Instance', handleError, (resources) ->
             ec2.describeInstanceStatus resources, handleError, (instances) ->
                 res.send
@@ -29,64 +22,42 @@ exports.get = (req, res) ->
                         instance: instance['instanceId'],
                         status:   instance['instanceState']['name']
 
-exports.put = (req, res) ->
-    handleError = (error) ->
-        res.send error.code, error.document['Error']['Message']
-
+exports.put = (req, res, next) ->
     stackName      = "#{req.params.id}-#{environmentName}"
     templateParams = res.body
     templateName   = req.params.templateName
 
-    s3.getObject templateName, handleError, (templateObject) ->
+    s3.getObject templateName, next, (templateObject) ->
         cloudformation.updateStack stackName, templateObject, templateParams, handleError, () ->
             res.send req.body
 
-exports.post = (req, res) ->
-    handleError = (error) ->
-        res.send error.code, error.document['Error']['Message']
-
+exports.post = (req, res, next) ->
     stackName      = "#{req.params.id}-#{environmentName}"
     templateParams = res.body
     templateName   = req.params.templateName
 
-    s3.getObject templateName, handleError, (templateObject) ->
+    s3.getObject templateName, next, (templateObject) ->
         cloudformation.createStack stackName, templateObject, templateParams, handleError, () ->
             res.send req.body
 
-exports.delete = (req, res) ->
-    handleError = (error) ->
-        res.send error.code, error.document['Error']['Message']
-
+exports.delete = (req, res, next) ->
     stackName = "#{req.params.id}-#{environmentName}"
+    cloudformation.deleteStack stackName, next, () -> res.send ''
 
-    cloudformation.deleteStack stackName, handleError, () -> res.send ''
-
-exports.start = (req, res) ->
-    handleError = (error) ->
-        res.send error.code, error.document['Error']['Message']
-
+exports.start = (req, res, next) ->
     stackName = "#{req.params.id}-#{environmentName}"
-    
-    cloudformation.describeStacks stackName, handleError, (stack) ->
+    cloudformation.describeStacks stackName, next, (stack) ->
         cloudformation.listStackResources stackName, 'AWS::EC2::Instance', handleError, (resources) ->
             ec2.startInstances resources, handleError, () -> res.send ''
 
-exports.stop = (req, res) ->
-    handleError = (error) ->
-        res.send error.code, error.document['Error']['Message']
-
+exports.stop = (req, res, next) ->
     stackName = "#{req.params.id}-#{environmentName}"
-    
-    cloudformation.describeStacks stackName, handleError, (stack) ->
+    cloudformation.describeStacks stackName, next, (stack) ->
         cloudformation.listStackResources stackName, 'AWS::EC2::Instance', handleError, (resources) ->
             ec2.stopInstances resources, handleError, () -> res.send ''
 
-exports.reboot = (req, res) ->
-    handleError = (error) ->
-        res.send error.code, error.document['Error']['Message']
-
+exports.reboot = (req, res, next) ->
     stackName = "#{req.params.id}-#{environmentName}"
-    
-    cloudformation.describeStacks stackName, handleError, (stack) ->
+    cloudformation.describeStacks stackName, next, (stack) ->
         cloudformation.listStackResources stackName, 'AWS::EC2::Instance', handleError, (resources) ->
             ec2.rebootInstances resources, handleError, () -> res.send ''

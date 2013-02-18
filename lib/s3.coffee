@@ -4,11 +4,18 @@ s3  = api.
       setBucket(process.env.BUCKET_NAME)
 
 exports.get = (errorCallback, callback) ->
-    s3.get '/', 'xml', (error, result) ->
-        errorCallback(error) if error?
-        callback result
+    request '/', (result) ->
+        response = []
+        response = [].concat result['Contents'] if result['Contents']
+        callback response
 
 exports.getObject = (objectName, errorCallback, callback) ->
-    s3.get "/#{objectName}", 'xml', (error, result) ->
-        errorCallback(error) if error?
-        callback result    
+    request "/#{objectName}", (result) ->
+        callback result['Contents']
+
+request = (path, next, callback) ->
+    s3.get method, 'xml', (error, result) ->
+        if error?
+            next error
+        else
+            callback result
