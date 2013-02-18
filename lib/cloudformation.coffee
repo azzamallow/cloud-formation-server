@@ -3,6 +3,7 @@ cloudformation  = api.
                   load('cloudformation', process.env.ACCESS_KEY, process.env.ACCESS_KEY_SECRET).
                   setRegion(process.env.AWS_REGION)
 request         = require('./request').for(cloudformation)
+Array           = require('./array')
 
 exports.listStacks = (environmentName, next, callback) ->
     query = 'StackStatusFilter.member.1': 'CREATE_COMPLETE', 'StackStatusFilter.member.2': 'CREATE_IN_PROGRESS'
@@ -30,7 +31,7 @@ exports.listStackResources = (stackName, resourceType, next, callback) ->
 exports.createStack = (stackName, templateBody, templateParams, next, callback) ->
     query = 'StackName': stackName, 'TemplateBody': templateBody
 
-    eachPair templateParams, (key, value, index) -> 
+    Array.eachPair templateParams, (key, value, index) -> 
         query["Parameters.member.#{index}.ParameterKey"] = key
         query["Parameters.member.#{index}.ParameterValue"] = value
 
@@ -39,7 +40,7 @@ exports.createStack = (stackName, templateBody, templateParams, next, callback) 
 exports.updateStack = (stackName, templateBody, templateParams, next, callback) ->
     query = 'StackName': stackName, 'TemplateBody': templateBody
 
-    eachPair templateParams, (key, value, index) -> 
+    Array.eachPair templateParams, (key, value, index) -> 
         query["Parameters.member.#{index}.ParameterKey"] = key
         query["Parameters.member.#{index}.ParameterValue"] = value
 
@@ -48,9 +49,3 @@ exports.updateStack = (stackName, templateBody, templateParams, next, callback) 
 exports.deleteStack = (stackName, next, callback) ->
     query = 'StackName': stackName
     request 'DeleteStack', query, next, callback
-
-eachPair = (object, callback) ->
-    index = 1
-    for key, value of object
-        callback key, value, index
-        index++
