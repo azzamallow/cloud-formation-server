@@ -1,4 +1,2 @@
-@templates = require './templates.coffee'
-
 exports.connect = (app) ->
-    app.get '/templates', @templates.all
+    app.get '/templates', require('./templates').all
