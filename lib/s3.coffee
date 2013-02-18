@@ -14,7 +14,7 @@ exports.getObject = (objectName, errorCallback, callback) ->
         callback result['Contents']
 
 request = (path, next, callback) ->
-    s3.get method, 'xml', (error, result) ->
+    s3.get path, 'xml', (error, result) ->
         if error?
             next error
         else
